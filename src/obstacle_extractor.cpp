@@ -44,14 +44,14 @@ ObstacleExtractor::ObstacleExtractor(std::shared_ptr<rclcpp::Node> nh, std::shar
   nh_ = nh;
   nh_local_ = nh_local;
   p_active_ = false;
-//   params_srv_ = nh_->create_service<std_srvs::srv::Empty>("params", 
-//                                                           std::bind(
-//                                                                 &ObstacleExtractor::updateParams,
-//                                                                 this, 
-//                                                                 std::placeholders::_1,
-//                                                                 std::placeholders::_2,
-//                                                                 std::placeholders::_3
-//                                                           ));
+  params_srv_ = nh_->create_service<std_srvs::srv::Empty>("params", 
+                                                          std::bind(
+                                                                &ObstacleExtractor::updateParams,
+                                                                this, 
+                                                                std::placeholders::_1,
+                                                                std::placeholders::_2,
+                                                                std::placeholders::_3
+                                                          ));
 
   tf_buffer_ = std::make_unique<tf2_ros::Buffer>(nh_->get_clock());
   tf_listener_ = std::make_shared<tf2_ros::TransformListener>(*tf_buffer_);
@@ -125,8 +125,10 @@ void ObstacleExtractor::updateParamsUtil(){
             "pcl", 10, std::bind(&ObstacleExtractor::pclCallback, this, std::placeholders::_1));
       }else if (p_use_pcl_2_){
         RCLCPP_INFO_STREAM_ONCE(nh_->get_logger(), "Using PointCloud2 topic");
+        rclcpp::QoS qos_profile{rclcpp::SensorDataQoS()};
+        qos_profile.reliability(RMW_QOS_POLICY_RELIABILITY_BEST_EFFORT);
         pcl2_sub_ = nh_->create_subscription<sensor_msgs::msg::PointCloud2>(
-            "pcl2", 10, std::bind(&ObstacleExtractor::pcl2Callback, this, std::placeholders::_1));
+            "pcl2", qos_profile, std::bind(&ObstacleExtractor::pcl2Callback, this, std::placeholders::_1));
       }
       obstacles_pub_ = nh_->create_publisher<obstacle_detector::msg::Obstacles>("raw_obstacles", 10);
       obstacles_vis_pub_ = nh_->create_publisher<visualization_msgs::msg::MarkerArray>("raw_obstacles_visualization", 10);
@@ -486,8 +488,9 @@ void ObstacleExtractor::publishVisualizationObstacles(){
   }
 
   for (const Circle& c : circles_) {
-    if (c.center.x > p_min_x_limit_ && c.center.x < p_max_x_limit_ &&
-        c.center.y > p_min_y_limit_ && c.center.y < p_max_y_limit_) {
+    // if (c.center.x > p_min_x_limit_ && c.center.x < p_max_x_limit_ &&
+    //     c.center.y > p_min_y_limit_ && c.center.y < p_max_y_limit_) {
+    if (true) {
         auto circ_marker = visualization_msgs::msg::Marker();
         circ_marker.header.stamp = stamp_;
         circ_marker.header.frame_id = published_obstacles_frame_id_;
@@ -582,8 +585,9 @@ void ObstacleExtractor::publishObstacles() {
   }
 
   for (const Circle& c : circles_) {
-    if (c.center.x > p_min_x_limit_ && c.center.x < p_max_x_limit_ &&
-        c.center.y > p_min_y_limit_ && c.center.y < p_max_y_limit_) {
+    // if (c.center.x > p_min_x_limit_ && c.center.x < p_max_x_limit_ &&
+    //     c.center.y > p_min_y_limit_ && c.center.y < p_max_y_limit_) {
+    if (true) {
         obstacle_detector::msg::CircleObstacle circle;
 
         circle.center.x = c.center.x;
