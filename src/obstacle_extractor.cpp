@@ -89,6 +89,10 @@ void ObstacleExtractor::updateParamsUtil(){
   nh_->declare_parameter("max_y_limit", rclcpp::PARAMETER_DOUBLE);
   nh_->declare_parameter("frame_id", rclcpp::PARAMETER_STRING);
 
+  // platoon
+  nh_->declare_parameter("truck_id", 0);
+  truck_id_ = nh_->get_parameter("truck_id").as_int();
+
   nh_->get_parameter_or("active", p_active_, true);
   nh_->get_parameter_or("use_scan", p_use_scan_, true);
   nh_->get_parameter_or("use_pcl", p_use_pcl_, true);
@@ -130,8 +134,10 @@ void ObstacleExtractor::updateParamsUtil(){
         pcl2_sub_ = nh_->create_subscription<sensor_msgs::msg::PointCloud2>(
             "pcl2", qos_profile, std::bind(&ObstacleExtractor::pcl2Callback, this, std::placeholders::_1));
       }
-      obstacles_pub_ = nh_->create_publisher<obstacle_detector::msg::Obstacles>("raw_obstacles", 10);
-      obstacles_vis_pub_ = nh_->create_publisher<visualization_msgs::msg::MarkerArray>("raw_obstacles_visualization", 10);
+      const std::string obstacles_topic = "/truck" + std::to_string(truck_id_) + "/raw_obstacles";
+      obstacles_pub_ = nh_->create_publisher<obstacle_detector::msg::Obstacles>(obstacles_topic, 10);
+      const std::string obstacles_vis_topic = "/truck" + std::to_string(truck_id_) + "/raw_obstacles_visualization";
+      obstacles_vis_pub_ = nh_->create_publisher<visualization_msgs::msg::MarkerArray>(obstacles_vis_topic, 10);
     }
     else {
       // Send empty message
