@@ -11,7 +11,7 @@ def generate_nodes(context, *, num_trucks):
         node = Node(
             package='obstacle_detector',
             executable='obstacle_extractor_node',
-            name='obstacle_extractor',
+            name=f'obstacle_extractor_{i}',
             remappings=[
                 ('/scan', '/merged_scan'),
                 ('/pcl', '/truck1/front_lidar'),
