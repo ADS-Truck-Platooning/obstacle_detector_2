@@ -7,7 +7,7 @@ from launch_ros.actions import Node
 def generate_nodes(context, *, num_trucks):
     nodes = []
 
-    for i in range(1, int(num_trucks)):
+    for i in range(int(num_trucks)):
         node = Node(
             package='obstacle_detector',
             executable='obstacle_extractor_node',
